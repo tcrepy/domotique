@@ -91,6 +91,15 @@ server.post('/supprimer', function (req, res) {
     })
 });
 
+server.post('/add', function(req, res){
+    let name = req.body.name;
+    let pgpio = req.body.pgpio;
+    connection.query('INSERT INTO switch SET SW_NOM = "' + name + '", SW_GPIO_ID = "'+ pgpio + '", SW_BOOL = 0', function (error, results, fields) {
+        if (error) res.json({'etat': 'err'});
+        res.json({'etat': 'ok'});
+    });
+});
+
 server.listen(8080);
 
 console.log('Listening on 8080...');

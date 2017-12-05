@@ -14,8 +14,11 @@
 </head>
 <body>
 <div id="domotique">
-    <div v-for="lampe in liste" v-if="typeof liste.erreur === 'undefined'">
-        <panneau :nom="lampe.SW_NOM" :check="lampe.SW_BOOL" :id="lampe.SW_ID"></panneau>
+    <div v-if="typeof liste.erreur === 'undefined'" v-on:reload="select()">
+        <div v-for="lampe in liste">
+            <panneau :add="false" :nom="lampe.SW_NOM" :check="lampe.SW_BOOL" :id="lampe.SW_ID" ></panneau>
+        </div>
+        <panneau :add="true"></panneau>
     </div>
     <div v-else="typeof liste.erreur !== 'undefined'">
         <h3>Pas de connexion</h3>
