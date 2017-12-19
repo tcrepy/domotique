@@ -1,8 +1,6 @@
 .contenant {
     display: block;
     position: relative;
-    width:180px;
-    height: 220px;
     float: left;
     margin: 10px;
     z-index: 1;
@@ -240,4 +238,23 @@ html, body {
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
+}
+
+@media (max-width: 380px){
+    .contenant{
+        width:355px;
+        height: 220px;
+    }
+}
+@media (min-width: 415px) and (max-width : 1025px){
+    .contenant{
+        width: 235px;
+        height: 230px;
+    }
+}
+@media (min-width : 1025px){
+    .contenant{
+        width:180px;
+        height: 220px;
+    }
 }
