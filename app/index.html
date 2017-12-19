@@ -14,10 +14,13 @@
 </head>
 <body>
 <div id="domotique">
-    <div v-if="typeof liste.erreur === 'undefined'" v-on:reload="select()">
-        <div v-for="lampe in liste">
-            <panneau :add="false" :nom="lampe.SW_NOM" :check="lampe.SW_BOOL" :id="lampe.SW_ID" ></panneau>
-        </div>
+    <div v-if="typeof liste.erreur === 'undefined'">
+
+        <panneau v-for="(lampe, index) in liste" :key="index" :add="false" :nom="lampe.SW_NOM"
+                 :check="lampe.SW_BOOL" :id="lampe.SW_ID" :gpio="lampe.SW_GPIO_ID"
+                 @remove="liste.splice(index, 1)"
+                 @add="addElem"></panneau>
+
         <panneau :add="true"></panneau>
     </div>
     <div v-else="typeof liste.erreur !== 'undefined'">

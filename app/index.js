@@ -3,7 +3,8 @@ let panneau = {
         add: {default: false},
         nom: String,
         check: {default: 0},
-        id: Number
+        id: Number,
+        gpio: Number,
     },
     data: function () {
         return {
@@ -14,8 +15,7 @@ let panneau = {
             pgpio: '',
         }
     },
-    template:
-        `<div class='contenant'>
+    template: `<div class='contenant'>
             <div class='card'>
                 <transition name='rotateZ' appear>
                     <div class='pannel' v-if='!isVisible'>
@@ -40,9 +40,10 @@ let panneau = {
                 <transition name='rotateZ'>
                     <div class='dialog' v-if='isVisible'>
                         <div v-if="add === false">
+                            {{gpio}}
                             <div class='params'>
                                 <div class='inputs'>
-                                    <input type='text' name='newName' v-model='newName' placeholder='Nouveau nom'>
+                                    <input type='text' name='newName' v-model='newName' placeholder='Nouveau nom' @keydown.enter="updateName(id)">
                                 </div>
                                 <button class="button" @click='updateName(id)'>Changer le nom</button>
                             </div>
@@ -67,7 +68,7 @@ let panneau = {
         </div>`,
     methods: {
         update: function (id, event) {
-            this.$http.post('http://localhost:8080/update', {'id': id, 'bool': event.target.checked}).then(
+            this.$http.post('http://149.202.41.94:8080/update', {'id': id, 'bool': event.target.checked}).then(
                 response => {
                     this.result = response.body;
                 },
@@ -81,7 +82,7 @@ let panneau = {
             this.isVisible = !this.isVisible;
         },
         updateName(id) {
-            this.$http.post('http://localhost:8080/updatename', {'id': id, 'newName': this.newName}).then(
+            this.$http.post('http://149.202.41.94:8080/updatename', {'id': id, 'newName': this.newName}).then(
                 response => {
                     this.result = response.body;
                     this.oldName = this.newName;
@@ -95,19 +96,7 @@ let panneau = {
             this.visible();
         },
         supprimer(id){
-            this.$http.post('http://localhost:8080/supprimer', {'id': id}).then(
-                response => {
-                    this.result = response.body;
-                },
-                response => {
-                    this.result = {'erreur': 'Impossible de mettre à jour la bdd'};
-                    console.log('ERREUR');
-                }
-            );
-            this.destroy();
-        },
-        addLamp() {
-            this.$http.post('http://localhost:8080/add', {'name': this.newName, 'pgpio': this.pgpio}).then(
+            this.$http.post('http://149.202.41.94:8080/supprimer', {'id': id}).then(
                 response => {
                     this.result = response.body;
                 },
@@ -117,7 +106,30 @@ let panneau = {
                 }
             );
             this.visible();
-            this.$emit('reload');
+            this.$emit('remove');
+        },
+        addLamp() {
+            this.$http.post('http://149.202.41.94:8080/add', {'name': this.newName, 'pgpio': this.pgpio}).then(
+                response => {
+                    this.result = response.body;
+                    this.newName = '';
+                    this.pgpio = '';
+                    this.$http.post('http://149.202.41.94:8080/select', {'id': response.body.results.insertId}).then(
+                        response => {
+                            this.visible();
+                            this.$parent.$data.liste.push(response.body[0]);
+                        },
+                        response => {
+                            this.liste = {'erreur': 'Impossible de récuperer les informations'};
+                        }
+                    );
+                },
+                response => {
+                    this.result = {'erreur': 'Impossible de mettre à jour la bdd'};
+                    console.log('ERREUR');
+                }
+            );
+
         }
     }
 };
@@ -134,7 +146,7 @@ let vue4 = new Vue({
     },
     methods: {
         select: function (id) {
-            this.$http.post('http://localhost:8080/select', {'id': id}).then(
+            this.$http.post('http://149.202.41.94:8080/select', {'id': id}).then(
                 response => {
                     this.liste = response.body;
                 },
@@ -142,9 +154,13 @@ let vue4 = new Vue({
                     this.liste = {'erreur': 'Impossible de récuperer les informations'};
                 }
             )
-        }
+        },
+        addElem: function(value){
+            console.log(value);
+            this.liste.push(value);
+        },
     },
     components: {
         panneau
-    }
+    },
 });
